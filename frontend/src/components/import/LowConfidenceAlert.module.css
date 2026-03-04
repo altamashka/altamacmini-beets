@@ -1,0 +1,134 @@
+.alert {
+  background: #1a1a2e;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.alertHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alertIcon {
+  font-size: 1rem;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.alertTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f59e0b;
+  flex: 1;
+}
+
+.diffSection {
+  border-top: 1px solid #2d2d44;
+  padding-top: 10px;
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.candidatesLabel {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.candidateList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.candidateItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #0f0f1a;
+  border-radius: 4px;
+  border: 1px solid #2d2d44;
+}
+
+.candidateIdx {
+  font-size: 0.75rem;
+  color: #64748b;
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.candidateInfo {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  flex: 1;
+  min-width: 0;
+}
+
+.candidateYear {
+  color: #94a3b8;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-top: 1px solid #2d2d44;
+  padding-top: 12px;
+}
+
+.actionBtn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.actionBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.actionBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.applyBtn {
+  background: #22c55e;
+  color: #fff;
+}
+
+.skipBtn {
+  background: #374151;
+  color: #94a3b8;
+}
+
+.asIsBtn {
+  background: #f59e0b;
+  color: #0f0f1a;
+  font-weight: 600;
+}
+
+.searchBtn {
+  background: #1e293b;
+  color: #64748b;
+  border: 1px solid #2d2d44;
+}

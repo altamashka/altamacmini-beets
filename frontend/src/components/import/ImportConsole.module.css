@@ -1,0 +1,96 @@
+.console {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2d2d44;
+  flex-shrink: 0;
+}
+
+.jobInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jobId {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.statusPending {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94a3b8;
+}
+
+.statusRunning {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+}
+
+.statusWaiting {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.statusComplete {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.statusError {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progressText {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.skippedText {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.alertSection {
+  flex-shrink: 0;
+}
+
+.eventStream {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.emptyStream {
+  font-size: 0.85rem;
+  color: #64748b;
+  padding: 16px 0;
+}

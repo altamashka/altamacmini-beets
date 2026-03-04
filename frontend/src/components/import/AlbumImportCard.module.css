@@ -1,0 +1,159 @@
+.card {
+  background: #1a1a2e;
+  border-radius: 8px;
+  border: 1px solid #2d2d44;
+  overflow: hidden;
+}
+
+.card.applied {
+  border-left: 3px solid #22c55e;
+}
+
+.card.skipped {
+  border-left: 3px solid #64748b;
+}
+
+.card.waiting {
+  border-left: 3px solid #a78bfa;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  gap: 12px;
+}
+
+.albumTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.statusChip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.status_applied {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.status_skipped {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94a3b8;
+}
+
+.status_waiting {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+}
+
+.artChip {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.artFound {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.artMissing {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.diff {
+  padding: 0 14px 10px;
+}
+
+.tracksSection {
+  border-top: 1px solid #2d2d44;
+  padding: 8px 14px;
+}
+
+.tracksToggle {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tracksToggle:hover {
+  color: #94a3b8;
+}
+
+.arrow {
+  font-size: 0.55rem;
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.arrowOpen {
+  transform: rotate(90deg);
+}
+
+.trackList {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trackItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.trackNum {
+  font-size: 0.75rem;
+  color: #64748b;
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.trackTitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackLen {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-family: monospace;
+  flex-shrink: 0;
+}
