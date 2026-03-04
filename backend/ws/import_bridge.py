@@ -87,3 +87,10 @@ class ImportBridge:
 
     def on_import_error(self, error: str) -> None:
         self._emit(WsEventType.import_error, error=error)
+
+    def _emit_raw(self, event_name: str, **payload) -> None:
+        try:
+            event = WsEventType(event_name)
+            self._emit(event, **payload)
+        except ValueError:
+            pass

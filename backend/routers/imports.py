@@ -1,7 +1,4 @@
-"""Import pipeline endpoints + WebSocket stream.
-
-Phase 2 implementation — stubs here, full logic in services/beets_importer.py.
-"""
+"""Import pipeline endpoints + WebSocket stream."""
 from __future__ import annotations
 
 import asyncio
@@ -14,6 +11,8 @@ from deps import get_executor, run_in_executor
 from models.imports import DecisionRequest, ImportJob, ImportJobStatus, ImportRequest
 from models.websocket import WsEventType, WsMessage
 from services import downloads_browser
+from services.beets_importer import run_import
+from ws.import_bridge import ImportBridge
 from ws.manager import ws_manager
 
 router = APIRouter(prefix="/api/import", tags=["imports"])
@@ -77,16 +76,27 @@ async def import_ws(websocket: WebSocket, job_id: str):
 
 
 async def _run_import(job_id: str) -> None:
-    """Placeholder: full implementation wired up in Phase 2."""
     job = _jobs[job_id]
     job.status = ImportJobStatus.running
     loop = asyncio.get_event_loop()
 
-    msg = WsMessage.make(WsEventType.import_started, job_id, paths=job.paths)
-    await ws_manager.broadcast(job_id, msg)
+    bridge = ImportBridge(job_id, loop)
+    _bridges[job_id] = bridge
 
-    # TODO Phase 2: wire beets_importer.run_import(job, bridge)
-    job.status = ImportJobStatus.complete
-    done_msg = WsMessage.make(WsEventType.import_complete, job_id, note="stub — Phase 2 pending")
-    await ws_manager.broadcast(job_id, done_msg)
-    await ws_manager.close_job(job_id)
+    try:
+        stats = await loop.run_in_executor(
+            get_executor(),
+            run_import,
+            job_id,
+            job.paths,
+            bridge,
+        )
+        job.status = ImportJobStatus.complete
+        job.albums_done = stats.get("albums_imported", 0)
+        job.albums_skipped = stats.get("albums_skipped", 0)
+    except Exception as e:
+        job.status = ImportJobStatus.error
+        job.error = str(e)
+    finally:
+        _bridges.pop(job_id, None)
+        await ws_manager.close_job(job_id)
