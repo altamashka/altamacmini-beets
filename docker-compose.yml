@@ -1,0 +1,39 @@
+services:
+  beets-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: beets-manager
+    restart: unless-stopped
+    ports:
+      - "8765:8000"
+    networks:
+      - web
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Berlin
+      BEETS_CONFIG_PATH: /beets/config/config.yaml
+      BEETS_LIBRARY_PATH: /beets/db/library.db
+      MUSIC_ROOT: /data/media/music
+      DOWNLOADS_ROOT: /data/downloads/completed/music
+      NAVIDROME_URL: http://navidrome:4533
+      NAVIDROME_ADMIN_USER: ${NAVIDROME_ADMIN_USER}
+      NAVIDROME_ADMIN_PASS: ${NAVIDROME_ADMIN_PASS}
+    volumes:
+      - /home/benmccash/.config/beets/config.yaml:/beets/config/config.yaml:ro
+      - /home/benmccash/data/beets/library.db:/beets/db/library.db:rw
+      - /home/benmccash/data/media/music:/data/media/music:rw
+      - /home/benmccash/data/downloads/completed/music:/data/downloads/completed/music:rw
+      - /home/benmccash/scripts:/scripts:ro
+    user: "1000:1000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health > /dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  web:
+    external: true
