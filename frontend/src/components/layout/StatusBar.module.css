@@ -1,0 +1,19 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  background: #0f0f1a;
+  border-top: 1px solid #2d2d44;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ok { background: #22c55e; }
+.err { background: #ef4444; }
