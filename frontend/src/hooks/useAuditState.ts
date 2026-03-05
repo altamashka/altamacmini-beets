@@ -52,7 +52,7 @@ export function useAuditState() {
   const clearSelection = useCallback(() => setSelected(new Set()), [])
 
   const fixIssue = useCallback(async (issue: AuditIssue, operation: string) => {
-    const albumId = issue.album_id
+    const albumId = issue.album_id ?? issue.album_ids?.[0]
     if (!albumId) return
     setFixing(prev => ({ ...prev, [issue.id]: 'pending' }))
     try {

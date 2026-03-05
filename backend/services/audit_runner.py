@@ -66,7 +66,7 @@ def run_audit(scan_id: str, loop: asyncio.AbstractEventLoop) -> list[AuditIssue]
                 type=AuditIssueType.missing_artwork,
                 album_id=album.id,
                 description=f"No artwork: {name}",
-                fixable=bool(album.mb_albumid),
+                fixable=True,
             ))
 
         # missing_metadata
