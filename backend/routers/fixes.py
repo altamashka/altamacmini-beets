@@ -1,18 +1,20 @@
-"""Fix operation endpoints + WebSocket stream.
-
-Phase 3 implementation — stubs here, full logic in services/beets_fixer.py.
-"""
+"""Fix operation endpoints + WebSocket stream."""
 from __future__ import annotations
 
 import asyncio
+import logging
 import uuid
 from typing import Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from deps import get_executor
 from models.library import FixRequest, FixResult
 from models.websocket import WsEventType, WsMessage
+from services import beets_fixer
 from ws.manager import ws_manager
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/fix", tags=["fixes"])
 
@@ -50,15 +52,39 @@ async def fix_ws(websocket: WebSocket, fix_id: str):
 
 
 async def _run_fix(fix_id: str, request: FixRequest) -> None:
-    """Placeholder — Phase 3 will wire beets_fixer."""
-    await ws_manager.broadcast(
-        fix_id,
-        WsMessage.make(WsEventType.fix_started, fix_id, operation=request.operation),
-    )
-    # TODO Phase 3: run beets_fixer.run_fix(fix_id, request)
-    _fix_jobs[fix_id]["status"] = "complete"
-    await ws_manager.broadcast(
-        fix_id,
-        WsMessage.make(WsEventType.fix_complete, fix_id, note="stub — Phase 3 pending"),
-    )
-    await ws_manager.close_job(fix_id)
+    loop = asyncio.get_event_loop()
+    await ws_manager.broadcast(fix_id, WsMessage.make(WsEventType.fix_started, fix_id, operation=request.operation))
+    try:
+        album_id = int(request.params.get("album_id", 0))
+        if not album_id:
+            raise ValueError("params.album_id is required")
+
+        op_map = {
+            "fetchart": beets_fixer.fetchart,
+            "fix_albumartist": beets_fixer.fix_albumartist,
+            "fix_tracknums": beets_fixer.fix_tracknums,
+            "unify_mbids": beets_fixer.unify_mbids,
+            "delete_album": beets_fixer.delete_album,
+        }
+        fn = op_map.get(request.operation)
+        if fn is None:
+            raise ValueError(f"Unknown operation: {request.operation}")
+
+        fix_result = await loop.run_in_executor(get_executor(), fn, album_id)
+
+        results = [
+            FixResult(issue_id=iid, success=fix_result.get("ok", False), message=str(fix_result))
+            for iid in request.issue_ids
+        ]
+        _fix_jobs[fix_id]["status"] = "complete"
+        _fix_jobs[fix_id]["results"] = [r.model_dump() for r in results]
+        await ws_manager.broadcast(
+            fix_id,
+            WsMessage.make(WsEventType.fix_complete, fix_id, results=[r.model_dump() for r in results]),
+        )
+    except Exception as e:
+        _fix_jobs[fix_id]["status"] = "error"
+        log.exception("Fix job failed: %s", fix_id)
+        await ws_manager.broadcast(fix_id, WsMessage.make(WsEventType.fix_error, fix_id, error=str(e)))
+    finally:
+        await ws_manager.close_job(fix_id)

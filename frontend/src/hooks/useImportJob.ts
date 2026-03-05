@@ -61,7 +61,7 @@ export function useImportJob() {
     }
   }, [])
 
-  const { connected } = useWebSocket(job ? `/ws/${job.id}` : null, onMessage)
+  const { connected } = useWebSocket(job ? `/api/import/ws/${job.id}` : null, onMessage)
 
   const startImport = useCallback(async (paths: string[]) => {
     setLoading(true)

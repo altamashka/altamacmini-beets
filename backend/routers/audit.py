@@ -1,17 +1,19 @@
-"""Audit scan endpoints + WebSocket stream.
-
-Phase 3 implementation — stubs here, full logic in services/audit_runner.py.
-"""
+"""Audit scan endpoints + WebSocket stream."""
 from __future__ import annotations
 
 import asyncio
+import logging
 import uuid
 from typing import Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from deps import get_executor
 from models.websocket import WsEventType, WsMessage
+from services import audit_runner
 from ws.manager import ws_manager
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/audit", tags=["audit"])
 
@@ -49,12 +51,22 @@ async def audit_ws(websocket: WebSocket, scan_id: str):
 
 
 async def _run_audit(scan_id: str) -> None:
-    """Placeholder — Phase 3 will wire audit_runner."""
+    loop = asyncio.get_event_loop()
     await ws_manager.broadcast(scan_id, WsMessage.make(WsEventType.audit_started, scan_id))
-    # TODO Phase 3: run audit_runner.run_audit(scan_id)
-    _scans[scan_id]["status"] = "complete"
-    await ws_manager.broadcast(
-        scan_id,
-        WsMessage.make(WsEventType.audit_complete, scan_id, note="stub — Phase 3 pending"),
-    )
-    await ws_manager.close_job(scan_id)
+    try:
+        issues = await loop.run_in_executor(get_executor(), audit_runner.run_audit, scan_id, loop)
+        _scans[scan_id]["issues"] = [i.model_dump() for i in issues]
+        _scans[scan_id]["status"] = "complete"
+        counts: dict = {}
+        for issue in issues:
+            counts[issue.type] = counts.get(issue.type, 0) + 1
+        await ws_manager.broadcast(
+            scan_id,
+            WsMessage.make(WsEventType.audit_complete, scan_id, counts=counts, total=len(issues)),
+        )
+    except Exception as e:
+        _scans[scan_id]["status"] = "error"
+        _scans[scan_id]["error"] = str(e)
+        log.exception("Audit scan failed: %s", scan_id)
+    finally:
+        await ws_manager.close_job(scan_id)
