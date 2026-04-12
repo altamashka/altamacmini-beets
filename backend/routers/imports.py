@@ -91,9 +91,13 @@ async def _run_import(job_id: str) -> None:
             job.paths,
             bridge,
         )
-        job.status = ImportJobStatus.complete
         job.albums_done = stats.get("albums_imported", 0)
         job.albums_skipped = stats.get("albums_skipped", 0)
+        if stats.get("albums_error", 0) > 0:
+            job.status = ImportJobStatus.error
+            job.error = "Beets import failed — check container logs"
+        else:
+            job.status = ImportJobStatus.complete
     except Exception as e:
         job.status = ImportJobStatus.error
         job.error = str(e)

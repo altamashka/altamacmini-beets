@@ -11,7 +11,7 @@ from typing import Optional
 from beets import config as beets_config, importer
 from beets.library import Library
 
-from config import BEETS_CONFIG_PATH, BEETS_LIBRARY_PATH
+from config import BEETS_CONFIG_PATH, BEETS_LIBRARY_PATH, MUSIC_ROOT
 from ws.import_bridge import ImportBridge
 
 LOW_CONFIDENCE = 0.90
@@ -169,7 +169,11 @@ def run_import(job_id: str, paths: list[str], bridge: ImportBridge) -> dict:
         beets_config["import"]["autotag"] = True
         beets_config["import"]["quiet"] = False
 
-        with Library(BEETS_LIBRARY_PATH) as lib:
+        # Override directory to match container mount path
+        beets_config["directory"] = MUSIC_ROOT
+
+        lib = Library(BEETS_LIBRARY_PATH)
+        try:
             session = BridgedImportSession(
                 lib=lib,
                 loghandler=None,
@@ -180,10 +184,12 @@ def run_import(job_id: str, paths: list[str], bridge: ImportBridge) -> dict:
             session.run()
             stats["albums_imported"] = session._imported_count
             stats["albums_skipped"] = session._skipped_count
+            bridge.on_import_complete(stats)
+        finally:
+            lib._close()
     except Exception as e:
         log.exception("beets import failed for job %s", job_id)
         bridge.on_import_error(str(e))
         stats["albums_error"] += 1
 
-    bridge.on_import_complete(stats)
     return stats

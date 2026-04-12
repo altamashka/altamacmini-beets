@@ -92,12 +92,41 @@ export function DownloadsBrowser({ onSelectionChange }: Props) {
     return <div className={styles.error}>{rootError}</div>
   }
 
+  const allSelected = artists.length > 0 && artists.every(a => selected.has(a.entry.path))
+  const noneSelected = artists.length > 0 && artists.every(a => !selected.has(a.entry.path))
+
+  function handleSelectAll() {
+    if (allSelected) {
+      setSelected(new Set())
+    } else {
+      const next = new Set<string>()
+      artists.forEach(a => {
+        next.add(a.entry.path)
+        a.albums.forEach(al => next.add(al.path))
+      })
+      setSelected(next)
+    }
+  }
+
   if (artists.length === 0) {
     return <div className={styles.empty}>No folders found in downloads.</div>
   }
 
   return (
     <div className={styles.tree}>
+      <div className={styles.selectAllRow}>
+        <input
+          type="checkbox"
+          className={styles.checkbox}
+          checked={allSelected}
+          ref={(el) => { if (el) el.indeterminate = !allSelected && !noneSelected }}
+          onChange={handleSelectAll}
+        />
+        <span className={styles.selectAllLabel} onClick={handleSelectAll}>
+          {allSelected ? 'Deselect all' : 'Select all'}
+        </span>
+        <span className={styles.countBadge}>{artists.length}</span>
+      </div>
       {artists.map((node, idx) => (
         <div key={node.entry.path} className={styles.artistGroup}>
           <div className={styles.artistRow}>

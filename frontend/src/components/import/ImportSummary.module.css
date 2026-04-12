@@ -183,6 +183,32 @@
   animation: spin 0.6s linear infinite;
 }
 
+.errorBadge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-radius: 4px;
+}
+
+.resetBtn {
+  padding: 9px 20px;
+  background: #2d2d44;
+  color: #e2e8f0;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.15s;
+}
+
+.resetBtn:hover {
+  background: #3d3d5c;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

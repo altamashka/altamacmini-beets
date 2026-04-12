@@ -8,7 +8,7 @@ import os
 
 from beets.library import Library
 
-from config import BEETS_LIBRARY_PATH, MUSIC_ROOT
+from config import BEETS_CONFIG_PATH, BEETS_LIBRARY_PATH, MUSIC_ROOT
 from models.library import AlbumInfo, TrackInfo
 
 
@@ -43,34 +43,56 @@ def _album_from_album(album, include_tracks: bool = False) -> AlbumInfo:
     )
 
 
+def _init_beets_config():
+    from beets import config as beets_config
+    beets_config.read(user=False, defaults=True)
+    beets_config.set_file(BEETS_CONFIG_PATH)
+    beets_config["directory"] = MUSIC_ROOT
+
+
+def _open_library() -> Library:
+    _init_beets_config()
+    return Library(BEETS_LIBRARY_PATH)
+
+
 def list_albums(query: str = "") -> list[AlbumInfo]:
-    with Library(BEETS_LIBRARY_PATH) as lib:
+    lib = _open_library()
+    try:
         albums = lib.albums(query or "")
         return [_album_from_album(a) for a in albums]
+    finally:
+        lib._close()
 
 
 def get_album(album_id: int) -> AlbumInfo | None:
-    with Library(BEETS_LIBRARY_PATH) as lib:
+    lib = _open_library()
+    try:
         album = lib.get_album(album_id)
         if album is None:
             return None
         return _album_from_album(album, include_tracks=True)
+    finally:
+        lib._close()
 
 
 def library_stats() -> dict:
-    with Library(BEETS_LIBRARY_PATH) as lib:
+    lib = _open_library()
+    try:
         albums = list(lib.albums())
         items = list(lib.items())
         return {
             "album_count": len(albums),
             "track_count": len(items),
         }
+    finally:
+        lib._close()
 
 
 def is_library_connected() -> bool:
     try:
-        with Library(BEETS_LIBRARY_PATH) as lib:
-            list(lib.albums(""))
-            return True
+        lib = _open_library()
+        list(lib.albums(""))
+        lib._close()
+        return True
     except Exception:
         return False

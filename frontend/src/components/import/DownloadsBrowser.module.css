@@ -4,6 +4,31 @@
   gap: 2px;
 }
 
+.selectAllRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.selectAllLabel {
+  font-size: 0.82rem;
+  color: #a78bfa;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.countBadge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: #64748b;
+  background: #1e1e36;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
 .loading,
 .error,
 .empty {

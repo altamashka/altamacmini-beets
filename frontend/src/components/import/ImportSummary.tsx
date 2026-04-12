@@ -6,6 +6,7 @@ import styles from './ImportSummary.module.css'
 interface Props {
   job: ImportJob
   events: WsMessage[]
+  onReset: () => void
 }
 
 interface ConfidenceCounts {
@@ -14,7 +15,7 @@ interface ConfidenceCounts {
   red: number
 }
 
-export function ImportSummary({ job, events }: Props) {
+export function ImportSummary({ job, events, onReset }: Props) {
   const [scanState, setScanState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [scanError, setScanError] = useState<string | null>(null)
 
@@ -56,11 +57,15 @@ export function ImportSummary({ job, events }: Props) {
     }
   }
 
+  const isError = job.status === 'error'
+
   return (
     <div className={styles.summary}>
       <div className={styles.titleRow}>
-        <h2 className={styles.title}>Import Complete</h2>
-        <span className={styles.completedBadge}>✓ Done</span>
+        <h2 className={styles.title}>{isError ? 'Import Failed' : 'Import Complete'}</h2>
+        <span className={isError ? styles.errorBadge : styles.completedBadge}>
+          {isError ? 'Error' : 'Done'}
+        </span>
       </div>
 
       <div className={styles.statsGrid}>
@@ -134,6 +139,10 @@ export function ImportSummary({ job, events }: Props) {
           <span className={styles.errorLabel}>Error:</span> {job.error}
         </div>
       )}
+
+      <button className={styles.resetBtn} onClick={onReset}>
+        Import Again
+      </button>
     </div>
   )
 }

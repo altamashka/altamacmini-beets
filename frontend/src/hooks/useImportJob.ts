@@ -14,10 +14,10 @@ export function useImportJob() {
     if (msg.event === 'import_complete') {
       setJob(prev => prev ? { ...prev, status: 'complete', pending_decision: undefined } : prev)
     } else if (msg.event === 'import_error') {
-      const errPayload = msg.payload as { message?: string }
+      const errPayload = msg.payload as { error?: string; message?: string }
       setJob(prev =>
         prev
-          ? { ...prev, status: 'error', error: errPayload.message, pending_decision: undefined }
+          ? { ...prev, status: 'error', error: errPayload.error ?? errPayload.message ?? 'Import failed', pending_decision: undefined }
           : prev
       )
     } else if (msg.event === 'album_decision_needed') {
@@ -83,5 +83,10 @@ export function useImportJob() {
     )
   }, [job])
 
-  return { job, events, connected, loading, startImport, decide }
+  const reset = useCallback(() => {
+    setJob(null)
+    setEvents([])
+  }, [])
+
+  return { job, events, connected, loading, startImport, decide, reset }
 }

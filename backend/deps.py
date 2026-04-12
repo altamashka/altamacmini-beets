@@ -11,7 +11,7 @@ from functools import lru_cache
 from beets import config as beets_config
 from beets.library import Library
 
-from config import BEETS_CONFIG_PATH, BEETS_LIBRARY_PATH
+from config import BEETS_CONFIG_PATH, BEETS_LIBRARY_PATH, MUSIC_ROOT
 
 _executor = ThreadPoolExecutor(max_workers=4)
 _lib_lock = threading.Lock()
@@ -29,6 +29,7 @@ def get_library() -> Library:
         if _lib is None:
             beets_config.read(user=False, defaults=True)
             beets_config.set_file(BEETS_CONFIG_PATH)
+            beets_config["directory"] = MUSIC_ROOT
             _lib = Library(BEETS_LIBRARY_PATH)
     return _lib
 

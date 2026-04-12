@@ -7,7 +7,7 @@ import { ImportSummary } from './ImportSummary'
 import styles from './ImportPage.module.css'
 
 export function ImportPage() {
-  const { job, events, loading, startImport, decide } = useImportJob()
+  const { job, events, loading, startImport, decide, reset } = useImportJob()
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
 
   function handleStart() {
@@ -30,7 +30,7 @@ export function ImportPage() {
       )
     }
     if (job.status === 'complete' || job.status === 'error') {
-      return <ImportSummary job={job} events={events} />
+      return <ImportSummary job={job} events={events} onReset={reset} />
     }
     return <ImportConsole job={job} events={events} onDecide={decide} />
   }

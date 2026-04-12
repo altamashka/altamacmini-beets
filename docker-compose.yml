@@ -17,12 +17,13 @@ services:
       BEETS_LIBRARY_PATH: /beets/db/library.db
       MUSIC_ROOT: /data/media/music
       DOWNLOADS_ROOT: /data/downloads/completed/music
+      HOME: /tmp
       NAVIDROME_URL: http://navidrome:4533
       NAVIDROME_ADMIN_USER: ${NAVIDROME_ADMIN_USER}
       NAVIDROME_ADMIN_PASS: ${NAVIDROME_ADMIN_PASS}
     volumes:
       - /home/benmccash/.config/beets/config.yaml:/beets/config/config.yaml:ro
-      - /home/benmccash/data/beets/library.db:/beets/db/library.db:rw
+      - /home/benmccash/data/beets:/beets/db:rw
       - /home/benmccash/data/media/music:/data/media/music:rw
       - /home/benmccash/data/downloads/completed/music:/data/downloads/completed/music:rw
       - /home/benmccash/scripts:/scripts:ro
