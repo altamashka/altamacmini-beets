@@ -12,6 +12,7 @@ from models.imports import DecisionRequest, ImportJob, ImportJobStatus, ImportRe
 from models.websocket import WsEventType, WsMessage
 from services import downloads_browser
 from services.beets_importer import run_import
+from services.downloads_browser import count_audio_files
 from ws.import_bridge import ImportBridge
 from ws.manager import ws_manager
 
@@ -83,16 +84,41 @@ async def _run_import(job_id: str) -> None:
     bridge = ImportBridge(job_id, loop)
     _bridges[job_id] = bridge
 
+    # Pre-scan: filter out folders with no audio so beets doesn't silently drop them.
+    importable: list[str] = []
+    pre_skipped = 0
+    for path in job.paths:
+        if await run_in_executor(count_audio_files, path) > 0:
+            importable.append(path)
+        else:
+            pre_skipped += 1
+            bridge.on_album_begin(path)
+            bridge.on_album_skipped("no audio files found in folder")
+
+    job.albums_total = len(job.paths)
+
+    if not importable:
+        job.albums_skipped = pre_skipped
+        job.status = ImportJobStatus.complete
+        bridge.on_import_complete({
+            "albums_imported": 0,
+            "albums_skipped": pre_skipped,
+            "albums_error": 0,
+        })
+        _bridges.pop(job_id, None)
+        await ws_manager.close_job(job_id)
+        return
+
     try:
         stats = await loop.run_in_executor(
             get_executor(),
             run_import,
             job_id,
-            job.paths,
+            importable,
             bridge,
         )
         job.albums_done = stats.get("albums_imported", 0)
-        job.albums_skipped = stats.get("albums_skipped", 0)
+        job.albums_skipped = stats.get("albums_skipped", 0) + pre_skipped
         if stats.get("albums_error", 0) > 0:
             job.status = ImportJobStatus.error
             job.error = "Beets import failed — check container logs"

@@ -163,8 +163,8 @@ def run_import(job_id: str, paths: list[str], bridge: ImportBridge) -> dict:
         beets_config.set_file(BEETS_CONFIG_PATH)
 
         beets_config["import"]["timid"] = False
-        beets_config["import"]["copy"] = True
-        beets_config["import"]["move"] = False
+        beets_config["import"]["copy"] = False
+        beets_config["import"]["move"] = True
         beets_config["import"]["write"] = True
         beets_config["import"]["autotag"] = True
         beets_config["import"]["quiet"] = False

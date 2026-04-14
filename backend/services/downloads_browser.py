@@ -9,6 +9,22 @@ from pathlib import Path
 
 from config import DOWNLOADS_ROOT
 
+AUDIO_EXTENSIONS = {".flac", ".mp3", ".m4a", ".ogg", ".opus", ".wav", ".aac", ".wma", ".alac", ".aiff"}
+
+
+def count_audio_files(path: str) -> int:
+    """Recursively count audio files under path. Returns 0 if path missing."""
+    p = Path(path)
+    if not p.exists():
+        return 0
+    if p.is_file():
+        return 1 if p.suffix.lower() in AUDIO_EXTENSIONS else 0
+    count = 0
+    for entry in p.rglob("*"):
+        if entry.is_file() and entry.suffix.lower() in AUDIO_EXTENSIONS:
+            count += 1
+    return count
+
 
 def list_downloads(subpath: str = "") -> dict:
     """Return directory tree node for the given subpath under DOWNLOADS_ROOT."""

@@ -19,9 +19,8 @@ export function ImportSummary({ job, events, onReset }: Props) {
   const [scanState, setScanState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [scanError, setScanError] = useState<string | null>(null)
 
-  const matchEvents = events.filter(e =>
-    e.event === 'album_match' || e.event === 'album_decision_needed'
-  )
+  // Only album_match — album_decision_needed fires for the same album and would double-count.
+  const matchEvents = events.filter(e => e.event === 'album_match')
 
   const artFound = matchEvents.filter(e => {
     const p = e.payload as Partial<AlbumMatchPayload>
